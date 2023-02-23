@@ -1,0 +1,97 @@
+ita.edel
+315154039
+
+Remarks:
+
+Complexity of Part 1 algorithm:
+We will mark W - new width of image, H - new height of image
+
+1)First to pad the original image with white pixels, i calculated the new width and new height so they
+would be the closest power of 2 and made an array with the new sizes that will contain the pixels.
+The pixels that are in the edges will be white by default (the indexes that are the edges).
+so the first part is O(W*H) in time complexity and in memory due to the fact the pixel array is W*H
+and we are only doing Calcs in O(1) for W*H times.
+
+
+2)Secondly, for the part of dividing an image to sub images according to the numCharsInRow, meaning
+the resolution the user decided upon.
+To do it I decided to make a default method in image that will make an ArrayList of SubImage
+which is a new Image implementation i made. I created SubImage because I wanted to use the polymorphism
+that we get from using the Image interface. this allows me later on to use functions from the interface
+that are both in FileImage and in SubImage such as getPixel(). This is a better representation then a 2D
+Color array which is a "dumb" representation with no specific function we can use.
+[see 4) as well for more]
+I chose to use ArrayList because it is good in terms of keeping order of subImages,
+as well as the fact that Adding and object or Getting and object from the ArrayList is O(1).
+So i decided to use an ArrayList of SubImage because it is time effective and SubImage is a class
+which allows adding specific functions which is good if we need even more functions.
+This is O(W*H) in time complexity as well as space complexity.
+we go over W*H pixels and adding them to a new array which we use to make a new SubImage to add to
+the ArrayList. the other functions like getPixel() are O(1), in total its O(W*H).
+
+
+3) For calculating the ASCII chars brightness i used HashMap that has a Character as a key and a Double
+representing the brightness of a given key.
+For every CharSet we have to calculate the brightness of, i made a method that goes over all the chars
+in the charSet we got from the Shell.
+It uses the CharRender.getImg method and than counts how many white pixels were there, and divides
+them by 16 * 16, and puts the value into the hashmap as well as finding the min and
+max brightness values, then it goes over the chars again and does the newCharBrightness equation and puts
+the new value into the HashMap.
+I used a hashMap because inserting and getting values from the map are O(1) which is very good,
+this helps because we can access each character fast and using the char itself as the key.
+This is O(NumOfChars) in terms of time and space complexity.
+going over Chars for 2 times in total and doing calculation that are in a constant time,
+so we get O(NumOfChars).
+
+
+4) For calculating the average brightness of each sub image, i used the method described in (2) to divide
+the Image to sub images, and then creates a 2D array of doubles the size of NumCharsInCol * NumCharsInRow
+which are at Most the size of [W/2 * H/2] = O(W*H).
+We then go over each SubImage in the arrayList, and we use the fact that SubImage is an image to use the
+default function Pixels() to iter over the object because it's also an image (That is also why i made
+the class SubImage). we iterate over the current SubImage and sum the grey value of each pixel
+and then dividing it according to the formula and placing the value in the 2D array mentioned above.
+we finally return the 2D array which has the average brightness of each subImage.
+The time and space complexity is O(W*H) because at most we iter over half the width and length of the
+image. and we also have to store the subImages which are all together W*H.
+we also have to call the function in 2) so that costs O(W*H) by itself.
+So in total the time complexity is O(W*H + W*H) = O(W*H)
+*** i already explained why i used ArrayList in part 2)
+
+
+5) The method which acts a facade is in charge of what we said in 3-4, chooseChars().
+I made a hashMap that has an int- the number of chars in a row, as the key, and 2D array of double as
+the value.
+Every time we check if we already calculated the image avg brightness for the specific resolution,
+if we did we can get the 2D array from the map and use it, if not we will calculate the average
+brightness for this resolution (do phase 4) and add it to the map so we don't have to calculate it again.
+The map is very good because as we said the get and put methods are O(1) which is very fast.
+I did it to save time in case we want to render the picture with the same resolution, we dont
+have to do the 4th stage which is O(W*H) every time. meaning that if we have calculated it
+already we it in O(1).
+After that we need to do phase (3) in order to get the ASCII brightness values.
+Then we have to over each sub-image value in the 2D array and compare it with all the chars we have.
+In total we get that the time complexity is O(W*H + NumOfChars + W*H*NumOfChars) = O(W*H*NumOfChars)
+the space complexity is affected by the fact that we decided to store the 2D arrays in a map.
+there are at Most log(W) different resolutions so we need to store at most O(log(W)*W*H) values.
+(the size of the 2d array is at most O(W/2 * H/2)).
+This does save time in the overall run of the program because the next render of the same resolution
+will save the time for calculate and it become O(1 + NumOfChars + W*H*NumOfChars) which is the same
+complexity but less time to run.
+
+
+To sum up:
+the overall time complexity is O(Phase1 +Phase5) = O(W*H + W*H*NumOfChars) = O(W*H*NumOfChars) and the
+runtime itself improves after each render of a different resolution for the next render of the same
+resolution. This is good also because of the different reasons i named previously.
+The space complexity is O(log(W)*W*H + W*H) = O(log(W)*W*H).
+
+
+API:
+I didn't change the API of BrightnessImgCharMatcher. I did change the API of Image by adding the
+default method i explained about that divides an image to sub images. i made it a default method
+so that all objects of type image could use it.
+I added a package-private class called SubImage which implements image, i did it in order to give a proper
+and a specific representation of a single sub image as well as taking advantage of polymorphism.
+
