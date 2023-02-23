@@ -1,0 +1,31 @@
+ita.edel
+315154039
+
+Remarks:
+
+The clever player was implemented by going over each row and trying to mark
+each column in that row until until the player gets a win streak.
+if there are no columns in the row the player will go to the next row.
+
+The genius player was implemented by going over each column starting from the
+middle of the board and trying to mark each row, if the column ended and the
+player didn't win the colum will advance by one and if we went over the right
+half of the board we will go over the left half of the board.
+
+By each player implementing a shared interface we can have different type
+of players play a single game when each player has a different strategy to the
+game but all have the same function to run a single turn so they can be called
+as a "Player" class without knowing or caring what their implementation is.
+
+(This is on n=4, k=3):
+
+In game between Clever to Whatever player the score was 8410-1590 in favor of
+the Clever player.
+
+In a game between Genius to Clever player the score was 10000-0 in favor of
+the Genius player.
+
+In a game between 2 Whatever players the score was 4992-4958 to player1-player2
+(there were 50 ties)
+
+
